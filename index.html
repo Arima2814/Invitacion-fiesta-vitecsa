@@ -318,6 +318,33 @@
   .btn.ghost{color:var(--gold-300);border:1px solid rgba(227,194,113,.55);background:transparent}
   .btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.45)}
   .btn.ghost:hover{background:rgba(227,194,113,.08)}
+  button.btn{border:0;font-weight:600}
+  button.btn.ghost{border:1px solid rgba(227,194,113,.55);font-weight:400}
+  .btn:focus-visible,.rsvp input:focus-visible{outline:2px solid var(--gold-300);outline-offset:3px}
+  .btn[disabled]{opacity:.65;cursor:wait;transform:none}
+
+  /* ---------- RSVP modal ---------- */
+  .rsvp{
+    margin:auto;width:min(92vw,420px);max-height:90vh;overflow-y:auto;padding:0;
+    background:var(--navy-800);color:var(--ivory);border:1px solid var(--gold-500);border-radius:3px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6)
+  }
+  .rsvp::backdrop{background:rgba(6,10,20,.78);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+  .rsvp-form{padding:28px 22px 24px;text-align:center}
+  .rsvp h2{font-family:"Cinzel",serif;font-weight:600;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-300);margin-bottom:14px}
+  .rsvp-text{font-size:1.15rem;line-height:1.4;color:var(--ivory-soft);margin-bottom:18px}
+  .rsvp label{display:block;text-align:left;font-family:"Cinzel",serif;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-400);margin-bottom:6px}
+  .rsvp input[type=text]{
+    width:100%;font:inherit;font-size:1.15rem;color:var(--ivory);background:var(--navy-900);
+    border:1px solid rgba(227,194,113,.55);border-radius:2px;padding:11px 12px
+  }
+  .rsvp-fallback{display:none}
+  .rsvp-fallback.rsvp-open{display:block;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;box-shadow:0 0 0 100vmax rgba(6,10,20,.78)}
+  .rsvp-hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .rsvp-msg{min-height:1.4em;margin-top:10px;font-size:1.05rem;color:#ff9aa9;text-align:left}
+  .rsvp-ok{font-size:1.3rem;line-height:1.4;color:var(--ivory);margin:6px 0 20px}
+  .rsvp-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:14px}
+  .rsvp-btns .btn{justify-content:center}
 
   .signature{margin-top:34px;font-family:"Great Vibes",cursive;font-size:1.7rem;color:var(--ivory-soft)}
 
@@ -431,7 +458,11 @@
       </div>
 
       <div class="actions">
-        <a class="btn primary" href="https://share.google/8HnxmEAoildDn03p3" target="_blank" rel="noopener">
+        <button type="button" class="btn primary" id="rsvp-open">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span id="rsvp-open-text">Confirmar asistencia</span>
+        </button>
+        <a class="btn ghost" href="https://share.google/8HnxmEAoildDn03p3" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.1-7-11.5a7 7 0 1 1 14 0C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.6"/></svg>
           Cómo llegar
         </a>
@@ -448,7 +479,34 @@
 </section>
 <button class="replay" id="replay">↺ Ver sobre</button>
 
+<dialog class="rsvp" id="rsvp-dialog" aria-labelledby="rsvp-title">
+  <form class="rsvp-form" id="rsvp-form" novalidate>
+    <h2 id="rsvp-title">Confirma tu asistencia</h2>
+    <div id="rsvp-body">
+      <p class="rsvp-text">Escribe tu nombre completo para registrar tu lugar en la posada.</p>
+      <label for="rsvp-nombre">Nombre completo</label>
+      <input type="text" id="rsvp-nombre" name="nombre" required minlength="3" maxlength="100" autocomplete="name" aria-describedby="rsvp-msg" aria-invalid="false">
+      <div class="rsvp-hp" aria-hidden="true">
+        <label for="rsvp-sitio">Sitio</label>
+        <input type="text" id="rsvp-sitio" name="sitio" tabindex="-1" autocomplete="off">
+      </div>
+      <p class="rsvp-msg" id="rsvp-msg" role="status" aria-live="polite"></p>
+      <div class="rsvp-btns">
+        <button type="submit" class="btn primary" id="rsvp-submit">Enviar</button>
+        <button type="button" class="btn ghost" id="rsvp-cancel">Cancelar</button>
+      </div>
+    </div>
+    <div id="rsvp-done" hidden>
+      <p class="rsvp-ok" id="rsvp-ok" role="status" aria-live="polite"></p>
+      <div class="rsvp-btns">
+        <button type="button" class="btn primary" id="rsvp-close">Cerrar</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
 <script>
+const RSVP_URL = 'PEGAR_AQUI_URL_DE_APPS_SCRIPT';
 (function(){
   const stage=document.getElementById('stage');
   const env=document.getElementById('envelope');
@@ -516,6 +574,89 @@
     if(!reduce)requestAnimationFrame(draw);
   }
   draw();
+})();
+
+/* ---------- RSVP ---------- */
+(function(){
+  const KEY='rsvp_vitecsa';
+  const $=id=>document.getElementById(id);
+  const dlg=$('rsvp-dialog'),form=$('rsvp-form'),openBtn=$('rsvp-open'),openTxt=$('rsvp-open-text');
+  const nombreIn=$('rsvp-nombre'),sitioIn=$('rsvp-sitio'),msg=$('rsvp-msg'),submit=$('rsvp-submit');
+  const body=$('rsvp-body'),done=$('rsvp-done'),ok=$('rsvp-ok');
+  let sending=false;
+  const noDialog=typeof HTMLDialogElement==='undefined';
+  if(noDialog)dlg.classList.add('rsvp-fallback');
+  const NAME_RE=/^[A-Za-zÀ-ÖØ-öø-ÿ' .\-’]+$/,LETTER_RE=/[A-Za-zÀ-ÖØ-öø-ÿ]/;
+
+  function markConfirmed(){openTxt.textContent='Asistencia confirmada ✓'}
+  try{if(localStorage.getItem(KEY))markConfirmed()}catch(e){}
+
+  function reset(){
+    body.hidden=false;done.hidden=true;msg.textContent='';
+    submit.disabled=false;submit.textContent='Enviar';
+  }
+  openBtn.addEventListener('click',()=>{
+    reset();
+    nombreIn.setAttribute('aria-invalid','false');
+    if(noDialog)dlg.classList.add('rsvp-open');else dlg.showModal();
+    nombreIn.focus();
+  });
+  function close(){if(sending)return;if(noDialog)dlg.classList.remove('rsvp-open');else dlg.close()}
+  document.addEventListener('keydown',e=>{if(noDialog&&e.key==='Escape'&&dlg.classList.contains('rsvp-open'))close()});
+  $('rsvp-cancel').addEventListener('click',close);
+  $('rsvp-close').addEventListener('click',close);
+  dlg.addEventListener('cancel',e=>{if(sending)e.preventDefault()});
+  dlg.addEventListener('click',e=>{if(e.target===dlg)close()});
+
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(sending)return;
+    const nombre=nombreIn.value.normalize('NFC').trim().replace(/\s+/g,' ');
+    const palabras=nombre.split(' ').filter(w=>LETTER_RE.test(w));
+    if(nombre.length<3||nombre.length>100||!NAME_RE.test(nombre)||palabras.length<2){
+      msg.textContent='Escribe tu nombre completo (nombre y apellido), solo letras, espacios, apóstrofo, punto o guion.';
+      nombreIn.setAttribute('aria-invalid','true');
+      nombreIn.focus();return;
+    }
+    nombreIn.setAttribute('aria-invalid','false');
+    if(RSVP_URL==='PEGAR_AQUI_URL_DE_APPS_SCRIPT'){
+      msg.textContent='Confirmación no configurada';return;
+    }
+    sending=true;submit.disabled=true;submit.textContent='Enviando…';msg.textContent='';
+    const ctl=new AbortController();
+    const t=setTimeout(()=>ctl.abort(),15000);
+    try{
+      const res=await fetch(RSVP_URL,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({nombre:nombre,sitio:sitioIn.value}),
+        signal:ctl.signal
+      });
+      let data;
+      try{data=await res.json()}catch(pe){
+        msg.textContent='El servicio de confirmación no está disponible. Intenta más tarde.';
+        submit.disabled=false;submit.textContent='Enviar';return;
+      }
+      if(data&&data.ok===true){
+        ok.textContent=data.duplicado===true
+          ? nombre+', tu asistencia ya estaba registrada. ¡Te esperamos!'
+          : '¡Gracias, '+nombre+'! Tu asistencia quedó confirmada.';
+        try{localStorage.setItem(KEY,nombre)}catch(err){}
+        markConfirmed();
+        body.hidden=true;done.hidden=false;
+        $('rsvp-close').focus();
+      }else{
+        nombreIn.setAttribute('aria-invalid','true');
+        msg.textContent=(data&&typeof data.error==='string'&&data.error)?data.error:'No se pudo registrar. Intenta de nuevo.';
+        submit.disabled=false;submit.textContent='Enviar';
+      }
+    }catch(err){
+      msg.textContent='No pudimos enviar tu confirmación. Revisa tu conexión e inténtalo de nuevo.';
+      submit.disabled=false;submit.textContent='Enviar';
+    }finally{
+      clearTimeout(t);sending=false;
+    }
+  });
 })();
 </script>
 </body>
