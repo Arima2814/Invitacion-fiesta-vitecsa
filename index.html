@@ -302,6 +302,15 @@
   .dress .value{font-style:italic;font-weight:500;font-size:1.6rem;color:var(--gold-300);display:flex;align-items:center;justify-content:center;gap:10px}
   .dress svg{width:30px;height:20px;color:var(--gold-400)}
 
+  .valet{
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    margin:18px auto 0;max-width:320px;text-align:left;
+    color:var(--ivory-soft);font-size:1.05rem;line-height:1.35
+  }
+  .valet svg{flex:none;width:26px;height:26px;color:var(--gold-400)}
+  .valet b{font-weight:600;color:var(--ivory)}
+  .valet small{font-family:"Cinzel",serif;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-400)}
+
   .countdown{display:flex;justify-content:center;gap:clamp(10px,3vw,18px);margin-top:30px}
   .countdown div{min-width:62px;padding:10px 6px;border:1px solid rgba(227,194,113,.3);background:rgba(12,20,36,.45);border-radius:3px}
   .countdown b{display:block;font-family:"Cormorant Garamond",serif;font-weight:500;font-size:1.9rem;line-height:1;color:var(--ivory)}
@@ -450,6 +459,11 @@
         </p>
       </div>
 
+      <p class="valet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16v-3.5l2-5A2 2 0 0 1 6.9 6h10.2a2 2 0 0 1 1.9 1.5l2 5V16a1 1 0 0 1-1 1h-1"/><path d="M5 17H4a1 1 0 0 1-1-1"/><path d="M3.5 12h17"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/><path d="M9.3 17h5.4"/></svg>
+        <span>Servicio de <b>Valet Parking</b> disponible<br><small>Costo: $100.00 por vehículo</small></span>
+      </p>
+
       <div class="countdown" id="countdown" aria-label="Cuenta regresiva">
         <div><b id="cd-d">--</b><span>Días</span></div>
         <div><b id="cd-h">--</b><span>Horas</span></div>
@@ -467,7 +481,7 @@
           Cómo llegar
         </a>
         <a class="btn ghost" target="_blank" rel="noopener"
-           href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Posada%20Vitecsa&dates=20261211T190000/20261212T010000&ctz=America/Mexico_City&details=C%C3%B3digo%20de%20vestimenta%3A%20Vaquero&location=Sal%C3%B3n%20de%20Eventos%20VIP%20Xochimilco%2C%20Av.%20Guadalupe%20I.%20Ram%C3%ADrez%20481%2C%20Potrero%20de%20San%20Bernardino%2C%20Xochimilco%2C%2016030%20CDMX">
+           href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Posada%20Vitecsa&dates=20261211T190000/20261212T010000&ctz=America/Mexico_City&details=C%C3%B3digo%20de%20vestimenta%3A%20Vaquero.%20Valet%20Parking%20disponible%3A%20%24100.00%20por%20veh%C3%ADculo.&location=Sal%C3%B3n%20de%20Eventos%20VIP%20Xochimilco%2C%20Av.%20Guadalupe%20I.%20Ram%C3%ADrez%20481%2C%20Potrero%20de%20San%20Bernardino%2C%20Xochimilco%2C%2016030%20CDMX">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
           Agendar
         </a>
